@@ -1,0 +1,55 @@
+import pandas as pd
+from fpdf import FPDF
+
+def read_data(file_path):
+    data = pd.read_csv(file_path)
+    return data
+
+def analyze_data(data):
+    total_sales = data['Sales'].sum()
+    average_sales = data['Sales'].mean()
+    max_sales = data['Sales'].max()
+    min_sales = data['Sales'].min()
+    
+    return total_sales, average_sales, max_sales, min_sales
+def generate_pdf_report(data, total_sales, average_sales, max_sales, min_sales, output_path):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+  
+    pdf.add_page()
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Sales Report", ln=True, align='C')
+    pdf.ln(10)
+  
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="Summary of Analysis:", ln=True)
+    pdf.cell(200, 10, txt=f"Total Sales: ${total_sales:.2f}", ln=True)
+    pdf.cell(200, 10, txt=f"Average Sales: ${average_sales:.2f}", ln=True)
+    pdf.cell(200, 10, txt=f"Max Sales: ${max_sales:.2f}", ln=True)
+    pdf.cell(200, 10, txt=f"Min Sales: ${min_sales:.2f}", ln=True)
+    
+    pdf.ln(10)
+    pdf.set_font("Arial", size=10)
+    
+    pdf.cell(60, 10, 'Date', border=1)
+    pdf.cell(60, 10, 'Sales ($)', border=1)
+    pdf.ln()
+    
+    for index, row in data.iterrows():
+        pdf.cell(60, 10, row['Date'], border=1)
+        pdf.cell(60, 10, f"${row['Sales']:.2f}", border=1)
+        pdf.ln()
+  
+    pdf.output(output_path)
+def main():
+    # File path for the input CSV and output PDF
+    input_file = 'sales_data.csv'  # Replace with the actual file path
+    output_file = 'sales_report.pdf'
+    data = read_data(input_file)
+    total_sales, average_sales, max_sales, min_sales = analyze_data(data)
+    generate_pdf_report(data, total_sales, average_sales, max_sales, min_sales, output_file)
+    
+    print(f"PDF report generated: {output_file}")
+
+if __name__ == "__main__":
+    main()
